@@ -11,7 +11,7 @@ info:
   license:
     name: MIT
     url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
-host: modellobase.herokuapp.com
+host: assignmentbasemodel.herokuapp.com
 basePath: /api
 schemes:
   - http
