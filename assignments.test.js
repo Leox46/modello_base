@@ -1,4 +1,4 @@
-const root = process.env.SERVER_URL || 'http://127.0.0.1:8080/api'
+const root = process.env.SERVER_URL || 'https://assignmentbasemodel.herokuapp.com/api/v1' // http://127.0.0.1:8080/api
 const fetch = require("node-fetch")
 const assignmentsRoot = root+'/assignments'
 const exampleAssignment =  {

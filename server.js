@@ -162,7 +162,7 @@ app.use(function (req, res, next) {
 /**************************************************************************/
 
 // register our router on /api
-app.use('/api', router);
+app.use('/api/v1', router);
 
 // handle invalid requests and internal error
 app.use((req, res, next) => {
