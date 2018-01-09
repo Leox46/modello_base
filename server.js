@@ -38,7 +38,7 @@ var router = express.Router();
 router.get('/', function (req, res) {
   res.status = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.json({ message: 'Welcome to our API!!!' });
+  res.json({ message: 'Welcome to our API!' });
 });
 
 router.route('/assignments')
