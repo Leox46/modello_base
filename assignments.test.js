@@ -74,7 +74,7 @@ test('basic post and get single element', () => {
       return getOneAssignment(exampleAssignment.assignmentId)
     })
     .then(getResponse => {return getResponse.json()})
-    .then(jsonResponse => {expect(jsonResponse.assignmentResult).toEqual(exampleAssignment.assignmentResult)})
+    .then(jsonResponse => {expect(jsonResponse).toMatchObject(exampleAssignment)})
     //.catch(e => {console.log(e)})
 });
 

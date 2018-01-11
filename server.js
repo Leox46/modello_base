@@ -44,7 +44,7 @@ router.get('/', function (req, res) {
 router.route('/assignments')
 
   // create a assignment
-  // accessed at POST http://localhost:8080/api/assignments
+  // accessed at POST http://localhost:8080/api/v1/assignments
   .post(function (req, res) {
     res.status = 200;
     res.setHeader('Content-Type', 'application/json');
@@ -59,29 +59,35 @@ router.route('/assignments')
 
     // save the assignment and check for errors
     assignment.save(function (err) {
-      if (err) { res.send(err); }
-      res.json(assignment);
+      if (err) { res.send({ error: { message: "Item not found" }}) }
+      else{
+        res.json(assignment);
+      }
     });
   })
 
   // get all the assignments
-  // accessed at GET http://localhost:8080/api/assignments
+  // accessed at GET http://localhost:8080/api/v1/assignments
   // variante: questo server risponde anche se gli viene specificata come query
   // del GET lo studentId, ritornando tutti gli assignment con lo studentId specificato.
-  // accessed at GET http://localhost:8080/api/assignments/?studentId=177928
+  // accessed at GET http://localhost:8080/api/v1/assignments/?studentId=177928
   .get(function (req, res) {
     res.status = 200;
     res.setHeader('Content-Type', 'application/json');
     if(req.query.studentId == null) { // se NON è specificato lo studentId, allora ritorno tutti gli assignments
       Assignment.find(function (err, assignments) {
-        if (err) { res.send(err); }
-        res.json(assignments);
+        if (err) { res.send({ error: { message: "Item not found" }}) }
+        else{
+          res.json(assignments);
+        }
       });
     }
     else {
       Assignment.find( {'studentId': req.query.studentId}, function (err, assignments) {
-        if (err) { res.send(err); }
-        res.json(assignments);
+        if (err) { res.send({ error: { message: "Item not found" }}) }
+        else{
+          res.json(assignments);
+        }
       });
     }
   });
@@ -94,49 +100,57 @@ router.route('/assignments/:assignment_id')
   .get(function (req, res) {
     res.status = 200;
     res.setHeader('Content-Type', 'application/json');
-    Assignment.find( {'assignmentId': req.params.assignment_id}, function (err, assignment) {
-      if (err) { res.send(err); }
-      res.json(assignment);
+    Assignment.findOne( {'assignmentId': req.params.assignment_id}, function (err, assignment) {
+      if (err) { res.send({ error: { message: "Item not found" }}) }
+      else{
+        res.json(assignment);
+      }
     });
   })
 
   // update the assignment with this id
-  // (accessed at PUT http://localhost:8080/api/assignments/:assignment_id)
+  // (accessed at PUT http://localhost:8080/api/v1/assignments/:assignment_id)
   .put(function (req, res) {
     res.status = 200;
     res.setHeader('Content-Type', 'application/json');
     // use our assignment model to find the assignment we want
     // ATTENZIONE!: usare findOne, e non find, altrimenti ritorna una collezione di oggetti, e bisogna estrarre il primo!
     Assignment.findOne( {'assignmentId': req.params.assignment_id}, function (err, assignment) {
-      if (err) { res.send(err); }
-      // update the assignments info
-      if(assignment != null){
-        if(req.body.assignmentId != null) assignment.assignmentId = req.body.assignmentId;
-      	if(req.body.studentId != null) assignment.studentId = req.body.studentId;
-      	if(req.body.assignment != null) assignment.assignment = req.body.assignment;
-      	if( req.body.assignmentType != null) assignment.assignmentType = req.body.assignmentType;
-      	if(req.body.assignmentValuation != null) assignment.assignmentValuation = req.body.assignmentValuation;
-        // save the assignment
-        assignment.save(function (err) {
-          if (err) { res.send(err); }
-          res.json(assignment);
-        });
-      }
+      if (err) { res.send({ error: { message: "Item not found" }}) }
       else{
-        res.status = 404;
-        res.json({ error: { message: "Item Not Found" } });
+        // update the assignments info
+        if(assignment != null){
+          if(req.body.assignmentId != null) assignment.assignmentId = req.body.assignmentId;
+        	if(req.body.studentId != null) assignment.studentId = req.body.studentId;
+        	if(req.body.assignment != null) assignment.assignment = req.body.assignment;
+        	if( req.body.assignmentType != null) assignment.assignmentType = req.body.assignmentType;
+        	if(req.body.assignmentValuation != null) assignment.assignmentValuation = req.body.assignmentValuation;
+          // save the assignment
+          assignment.save(function (err) {
+            if (err) { res.send({ error: { message: "Item not found" }}) }
+            else{
+              res.json(assignment);
+            }
+          });
+        }
+        else{
+          res.status = 404;
+          res.json({ error: { message: "Item Not Found" } });
+        }
       }
     });
   })
 
   // delete the assignment with this id
-  // (accessed at DELETE http://localhost:8080/api/assignments/:assignment_id)
+  // (accessed at DELETE http://localhost:8080/api/v1/assignments/:assignment_id)
   .delete(function (req, res) {
     res.status = 200;
     res.setHeader('Content-Type', 'application/json');
     Assignment.remove( {'assignmentId': req.params.assignment_id}, function (err, assignment) {
-      if (err) { res.send(err); }
-      res.json({ message: 'Successfully deleted' });
+      if (err) { res.send({ error: { message: "Item not found" }}) }
+      else {
+        res.json({ message: 'Successfully deleted' });
+      }
     });
   });
 
@@ -147,7 +161,7 @@ router.route('/assignments/:assignment_id')
 // middleware route to support CORS and preflighted requests
 app.use(function (req, res, next) {
     // do logging
-    console.log('Something is happening.');
+    console.log('Something is happening: ' + req.method);
     //Enabling CORS
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -178,4 +192,4 @@ app.use((err, req, res, next) => {
 
 app.listen(port);
 console.log('Magic happens on port ' + port);
-//module.exports = router;
+module.exports = router;
